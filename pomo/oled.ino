@@ -21,11 +21,9 @@ void printOled(char *str);
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RST_PIN);
 
 void setupOled(){
-    Serial.begin(115200);
 
     // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
     if(!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS)) { 
-        Serial.println(F("SSD1306 allocation failed"));
         for(;;)
             delay(10000); // Don't proceed, loop forever
     }
@@ -76,7 +74,7 @@ void running1(){
 }
 
 
-void running2(int h, int m){
+void running2(int m, int s){
     char buf[15];
     
     strcat(buf, intToChar(h));

@@ -15,7 +15,7 @@ void running1();
 void running2(int h, int m);
 void done();
 void fail();
-void pause();
+void pause(int h, int m);
 void extend();
 void ready();
 
