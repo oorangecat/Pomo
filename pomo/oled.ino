@@ -1,12 +1,15 @@
+
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <oled.h>
+#include "animation.h"
+#include "oled.h"
 
-#define drawDelay 5
-#define standardSize 5
 
-void printOled(char[] str);
+static int lastFrame=0;
+
+void printOled(char *str);
+
 
 /*
  #Draw a single pixel in white
@@ -24,7 +27,7 @@ void setupOled(){
     if(!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS)) { 
         Serial.println(F("SSD1306 allocation failed"));
         for(;;)
-            sleep(10000); // Don't proceed, loop forever
+            delay(10000); // Don't proceed, loop forever
     }
 
     // Show initial display buffer contents on the screen --
@@ -37,7 +40,7 @@ void setupOled(){
 }
 
 //Basic block for printing text 
-void printOled(char[] str, int size){
+void printOled(char *str, int size){
     
     display.clearDisplay();
 
@@ -49,10 +52,37 @@ void printOled(char[] str, int size){
     delay(drawDelay);
 }
 
+char *intToChar(int num){
+    char ch=num+'0';
+    return &ch;
 }
-void menu_start(){
-     printOled("START >", standardSize);
 
+
+void menu_start(){
+    printOled("START >", standardSize);
+}
+
+void running1(){
+    if(lastFrame>=frameNum)
+        lastFrame=0;
+
+    display.clearDisplay();
+    display.drawBitmap(0,0,animation[lastFrame],128,64,1);
+    
+    display.display();
+    delay(drawDelay*2);
+
+    lastFrame++;
+}
+
+
+void running2(int h, int m){
+    char buf[15];
+    
+    strcat(buf, intToChar(h));
+    strcat(buf, ":");
+    strcat(buf, intToChar(m));
+    printOled(buf, standardSize);
 }
 
 void done(){
@@ -67,9 +97,6 @@ void extend(){
     printOled("Extend", standardSize);
 }
 
-void ready(){
-    printOled("Ready?", standardSize);
-}
 
 void ready(){
     printOled("Ready?", standardSize);
@@ -80,11 +107,15 @@ void menu_stats(){
 }
 
 void stats_tot(int totMin){
-    printOled("T: %d",totMin, standardSize);
+    char buf[15]="T: ";
+    strcat(buf, intToChar(totMin));
+    printOled(buf, standardSize);
 }
 
 void stats_sessions(int totSessions){
-    printOled("S: %d", totSessions);
+    char buf[15]="S: ";
+    strcat(buf, intToChar(totSessions));
+    printOled(buf, standardSize);
 }
 
 void stats_rst(){
@@ -96,11 +127,15 @@ void set(){
 }
 
 void set_work(int minShown){
-    printOled("W:%d", minShown);
+    char buf[15]="W:";
+    strcat(buf, intToChar(minShown));
+    printOled(buf, standardSize);
 }
 
 void set_pause(int minShown){
-    printOled("P:%d", minShown);
+    char buf[15]="S:";
+    strcat(buf, intToChar(minShown));
+    printOled(buf, standardSize);
 }
 
 void set_save(){
