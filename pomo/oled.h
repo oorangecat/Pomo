@@ -12,19 +12,22 @@ void setupOled();
 
 void menu_start();
 void running1();
-void running2(int h, int m);
+void running2(int m, int s);
 void done();
 void fail();
-void pause(int h, int m);
+void pause(int m, int s);
 void extend();
 void ready();
+
+void sure();
 
 void menu_stats();
 void stats_tot(int totMin);
 void stats_sessions(int totSessions);
 void stats_rst();
 
-void set();
+void menu_set();
 void set_work(int minShown);
 void set_pause(int minShown);
 void set_save();
+void set_back();

@@ -1,19 +1,21 @@
 enum pages{
-    menu_startp,
-    running1p,
-    running2p,
-    donep,
-    failp,
-    pausep,
-    extendp,
-    readyp,
-    menu_statsp,
-    stats_totp,
-    stats_sessionsp,
-    stats_rstp,
-    setp,
-    set_workp,
-    set_pausep,
-    set_savep
+    menu_startp, //x >
+    running1p, //x >
+    running2p,//x >
+    donep, //noneed noneed
+    failp, //noneed noneed
+    pausep, //X >
+    extendp, //x >
+    readyp, //x >
+    menu_statsp, //x >
+    stats_totp, //x >
+    stats_sessionsp, //x >
+    stats_rstp, //x >
+    menu_setp,  //x >
+    set_workp, //x >
+    set_pausep, //x >
+    set_savep,//x >
+    surep, //x >
+    set_backp // x >
 }
 

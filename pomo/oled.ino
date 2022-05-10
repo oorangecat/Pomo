@@ -91,13 +91,22 @@ void fail(){
     printOled("FAIL! :(", standardSize);
 }
 
+void pause(int m, int s){           //same as running2, showing clock
+    running2(m,s);
+}
+
 void extend(){
-    printOled("Extend", standardSize);
+    printOled("EXTEND", standardSize);
 }
 
 
 void ready(){
-    printOled("Ready?", standardSize);
+    printOled("READY?", standardSize);
+}
+
+
+void sure(){
+    printOled("SURE??", standardSize);
 }
 
 void menu_stats(){
@@ -120,7 +129,7 @@ void stats_rst(){
     printOled("< RST");
 }
 
-void set(){
+void menu_set(){
     printOled("< SET >");
 }
 
@@ -137,7 +146,11 @@ void set_pause(int minShown){
 }
 
 void set_save(){
-    printOled("< SAVE");
+    printOled("< SAVE",standardSize);
+}
+
+void set_back(){
+    printOled("BACK", standardSize);
 }
 
 
