@@ -9,7 +9,7 @@
 */
 
 
-#define EEPROM_SIZE 32      //32bytes allocated
+#define EEPROM_SIZE 64      //32bytes allocated
 #define INT_SIZE 4
 #define CURRENTWORKADDRESS 0
 #define CURRENTPAUSEADDRESS 4

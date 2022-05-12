@@ -51,6 +51,11 @@ void printOled(char *str, int size){
     delay(drawDelay);
 }
 
+char *intToChar(int num){
+    char ch=num+'0';
+    return &ch;
+}
+
 
 void menu_start(){
     printOled("START >", standardSize);
@@ -72,8 +77,13 @@ void running1(){
 
 void running2(int m, int s){
     char buf[15];
+    //strcat(buf, intToChar(m));    //this makes it crash
+    //strcat(buf, ":");
+    //strcat(buf, intToChar(s));
+     Serial.println("Pause:");
 
     sprintf(buf,"%02d:%02d",m,s);
+    Serial.print(buf);
     printOled(buf, standardSize);
 }
 
@@ -109,13 +119,15 @@ void menu_stats(){
 
 void stats_tot(int totMin){
     char buf[15];
-    sprintf(buf,"T: %d", totMin);
+    sprintf(buf,"T:%05d",totMin);
+
     printOled(buf, standardSize);
 }
 
 void stats_sessions(int totSessions){
     char buf[15];
-    sprintf(buf,"S: %d", totSessions);
+    sprintf(buf,"S:%05d",totSessions);
+
     printOled(buf, standardSize);
 }
 
@@ -129,13 +141,15 @@ void menu_set(){
 
 void set_work(int minShown){
     char buf[15];
-    sprintf(buf,"W: %d", minShown);
+    sprintf(buf,"W: %02d",minShown);
+
     printOled(buf, standardSize);
 }
 
 void set_pause(int minShown){
-    char buf[15]="S:";
-    sprintf(buf,"S: %d", minShown);
+    char buf[15];
+
+    sprintf(buf,"P:%02d",minShown);
     printOled(buf, standardSize);
 }
 

@@ -4,11 +4,11 @@
 #include <stdlib.h>
 #include <Ticker.h>
 
-#define BUTTON1_PIN 14     //ok
-#define BUTTON2_PIN 15     //arrow
+#define BUTTON1_PIN 12     //ok
+#define BUTTON2_PIN 13     //arrow
 #define TIMERDELAYMS 999
-#define DONEDELAY 2000
-#define FAILDELAY 5000
+#define DONEDELAY 5000
+#define FAILDELAY 3000
 #define EXTENDAMOUNT 1
 #define SETWORKSTEP 5
 #define SETPAUSESTEP 2
@@ -16,6 +16,8 @@
 #define MAXPAUSE 20
 #define MINWORK 5
 #define MINPAUSE 1
+#define BUTTONDELAY 200
+#define SCREENDELAY 30
 
 typedef enum  { button1, button2, nobutton } buttons_type;
 typedef enum  { working, paused, none } states_type;
@@ -31,6 +33,7 @@ int timer[2]={0,0};
 int page=menu_startp;
 int status=none;
 int currentSettings[2]={25,5};
+int toBeUpdated=false;
 
 void startTimer();
 void stopTimer();
@@ -45,34 +48,33 @@ void setup() {
 
   persistenceInit();
   setupOled();
-  
-  setCurrentWorkMinutes(25);
-  setCurrentPauseMinutes(5);
+
+  /*TO BE REMOVED - INIT EEPROM FIRST TIME
+  setCurrentWorkMinutes(1);
+  setCurrentPauseMinutes(1);
 
   setTotWorkTime(0);
   setTotWorkSessions(0);
-  
+  */
   currentSettingsGet();
 
   Serial.begin(115200);
  
-  Serial.println("-----------");
-  Serial.println(10, BIN);
-  Serial.println(10, HEX);
-  Serial.println(10, OCT);
   Serial.println(currentSettings[0]);
   Serial.print(currentSettings[1]);
   
   pinMode(BUTTON1_PIN, INPUT);
   pinMode(BUTTON2_PIN, INPUT);
   menu_start();
-  running2(0,1);      //this makes it crash :^)
+  //running2(0,1);      //this makes it crash :^)
   
   //ticker.attach_ms(TIMERDELAYMS, timerHandler);
 
 }
 
 int lastButton=nobutton;
+int updateRunning=0;
+
 
 void loop() {
   // for(int i=0; i<30; i++){
@@ -182,7 +184,7 @@ void loop() {
         case set_workp:     //ADD STEP TO WORK TIME SETTING
           currentSettings[0]+=SETWORKSTEP;
           if(currentSettings[0]>MAXWORK)
-            currentSettings[0]=MINWORK;
+            currentSettings[0]-=MAXWORK;
           
           set_work(currentSettings[0]);
           break;
@@ -190,7 +192,7 @@ void loop() {
         case set_pausep:    //ADD STEP TO PAUSE TIME SETTING
           currentSettings[1]+=SETPAUSESTEP;
           if(currentSettings[1]>MAXPAUSE)
-            currentSettings[1]=MINPAUSE;
+            currentSettings[1]-=MAXPAUSE;
           set_pause(currentSettings[1]);
           break;
 
@@ -206,7 +208,13 @@ void loop() {
           menu_set();
           page=menu_setp;
           break;
+
+
       }
+
+      delay (BUTTONDELAY);
+      Serial.println("X pressed");
+
   } else if(lastButton==button2){
         //--------------------------------BUTTON ARROW BEHAVIOUR
         switch(page){
@@ -279,30 +287,68 @@ void loop() {
             set_save();
             page=set_savep;
             break;
+
+          case set_savep:
+            set_back();
+            page=set_backp;
+            break;
           
           case set_backp:
-            set_back();
-            page=set_backp; 
+            set_work(getCurrentWorkMinutes());
+            page=set_workp; 
             break;
 
         }
+              delay (BUTTONDELAY);
+
   }
 
   // if(page==pausep || page==pausep){
   //   ticker.attach_ms(TIMERDELAYMS, timerHandler)
   // }
+
+  //update running1 more than 1fps
+
+  if(toBeUpdated){
+    if(status==working){
+        if(page==running2p)   //if WORKING with the clock, update it
+          running2(timer[0], timer[1]);
+        else
+          running1();         //else update animation
+      } else if(status == paused && page==donep){
+        done();
+        delay(DONEDELAY);
+        timer[0]=currentSettings[1];
+        timer[1]=0;
+        status=paused;
+        startTimer();
+        pause(timer[0], timer[1]);
+        page=pausep;
+      } else if(status==paused && page==pausep){    //if paused update the clock
+        pause(timer[0], timer[1]);  
+        page=pausep;
+      }
+     toBeUpdated=false;
+  }
+  
+  if(status==working && page==running1p && updateRunning>=SCREENDELAY){
+    updateRunning=0;
+    toBeUpdated=true;
+  } else if(page==running1p) { updateRunning++;}
+
+  delay(1);
 }
 
 
 int checkButton(){
-/*
+
   if(digitalRead(BUTTON1_PIN)==HIGH)
     return button1;
   else if (digitalRead(BUTTON2_PIN) ==HIGH)
     return button2;
   else
     return nobutton;
-    */
+
     return nobutton;
 
 }
@@ -310,24 +356,30 @@ int checkButton(){
 
 void startTimer(){
   ticker.attach_ms(TIMERDELAYMS, timerHandler);
+  Serial.println("Timer started!");
 }
 void stopTimer(){
   ticker.detach();
+   Serial.println("Timer stopped!");
+
 };
 
 void timerHandler(){
+  //timerHandler cannot deal with OLED update
+  //this is done in the loop
   if(timer[0]==0 && timer[1]==0){   //if timer is done
     if(status==working){        //if working, go to pause (set timer again)
       stopTimer();
-      done();
+      //done();
       page=donep;
-      delay(DONEDELAY);
-      timer[0]=currentSettings[1];
-      timer[1]=0;
+      //delay(DONEDELAY);
+      //timer[0]=currentSettings[1];
+      //timer[1]=0;
       status=paused;
-      startTimer();
-      pause(timer[0], timer[1]);
-      page=pausep;
+      //startTimer();
+      //pause(timer[0], timer[1]);
+      //page=pausep;
+      toBeUpdated=true;
       
       //add this session to stats
       updateStats();
@@ -345,6 +397,8 @@ void timerHandler(){
       timer[0]--;
     }
 
+    Serial.println("Updating screen");
+/*
     if(status==working){
       if(page==running2p)   //if WORKING with the clock, update it
         running2(timer[0], timer[1]);
@@ -352,7 +406,11 @@ void timerHandler(){
         running1();         //else update animation
     } else if(status==paused){    //if paused update the clock
       pause(timer[0], timer[1]);  
+      page=pausep;
     }
+    */
+    if(page==running2p) 
+      toBeUpdated=true;
   }
 }
 
