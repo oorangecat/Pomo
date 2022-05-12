@@ -8,7 +8,7 @@
 
 static int lastFrame=0;
 
-void printOled(char *str);
+void printOled(char *str, int size);
 
 
 /*
@@ -34,6 +34,7 @@ void setupOled(){
     delay(drawDelay);
     // Clear the buffer
     display.clearDisplay();
+    
 
 }
 
@@ -48,11 +49,6 @@ void printOled(char *str, int size){
     display.println(str);
     display.display(); 
     delay(drawDelay);
-}
-
-char *intToChar(int num){
-    char ch=num+'0';
-    return &ch;
 }
 
 
@@ -76,10 +72,8 @@ void running1(){
 
 void running2(int m, int s){
     char buf[15];
-    
-    strcat(buf, intToChar(h));
-    strcat(buf, ":");
-    strcat(buf, intToChar(m));
+
+    sprintf(buf,"%02d:%02d",m,s);
     printOled(buf, standardSize);
 }
 
@@ -114,34 +108,34 @@ void menu_stats(){
 }
 
 void stats_tot(int totMin){
-    char buf[15]="T: ";
-    strcat(buf, intToChar(totMin));
+    char buf[15];
+    sprintf(buf,"T: %d", totMin);
     printOled(buf, standardSize);
 }
 
 void stats_sessions(int totSessions){
-    char buf[15]="S: ";
-    strcat(buf, intToChar(totSessions));
+    char buf[15];
+    sprintf(buf,"S: %d", totSessions);
     printOled(buf, standardSize);
 }
 
 void stats_rst(){
-    printOled("< RST");
+    printOled("< RST", standardSize);
 }
 
 void menu_set(){
-    printOled("< SET >");
+    printOled("< SET >", standardSize);
 }
 
 void set_work(int minShown){
-    char buf[15]="W:";
-    strcat(buf, intToChar(minShown));
+    char buf[15];
+    sprintf(buf,"W: %d", minShown);
     printOled(buf, standardSize);
 }
 
 void set_pause(int minShown){
     char buf[15]="S:";
-    strcat(buf, intToChar(minShown));
+    sprintf(buf,"S: %d", minShown);
     printOled(buf, standardSize);
 }
 
@@ -152,5 +146,3 @@ void set_save(){
 void set_back(){
     printOled("BACK", standardSize);
 }
-
-

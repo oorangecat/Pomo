@@ -1,14 +1,15 @@
 #include "persistence.h"
 #include "oled.h"
 #include "pages.h"  //contains enum pages
+#include <stdlib.h>
 #include <Ticker.h>
 
-#define BUTTON1_PIN 1     //ok
-#define BUTTON2_PIN 2     //arrow
+#define BUTTON1_PIN 14     //ok
+#define BUTTON2_PIN 15     //arrow
 #define TIMERDELAYMS 999
 #define DONEDELAY 2000
 #define FAILDELAY 5000
-#define EXTENDAMOUNT
+#define EXTENDAMOUNT 1
 #define SETWORKSTEP 5
 #define SETPAUSESTEP 2
 #define MAXWORK 60
@@ -16,15 +17,20 @@
 #define MINWORK 5
 #define MINPAUSE 1
 
-enum buttons { button1, button2, none };
-enum states { working, paused, none };
+typedef enum  { button1, button2, nobutton } buttons_type;
+typedef enum  { working, paused, none } states_type;
+
+//states_type states;
+//buttons_type buttons_type;
+//pages_type pages;
+
 
 Ticker ticker;
 
-int timer=[0,0];
-int page=0;
-int currentStatus=none
-int currentSettings=[25,5];
+int timer[2]={0,0};
+int page=menu_startp;
+int status=none;
+int currentSettings[2]={25,5};
 
 void startTimer();
 void stopTimer();
@@ -33,23 +39,48 @@ void currentSettingsGet();
 void updateStats();   //add a session to stored stats
 
 
+
+
 void setup() {
 
   persistenceInit();
   setupOled();
-  currentSettingsGet();
-  pinMode(1, INPUT);
-  pinMode(2, INPUT);
+  
+  setCurrentWorkMinutes(25);
+  setCurrentPauseMinutes(5);
 
-  ticker.attach(TIMERDELAY, timerHandler);
+  setTotWorkTime(0);
+  setTotWorkSessions(0);
+  
+  currentSettingsGet();
+
+  Serial.begin(115200);
+ 
+  Serial.println("-----------");
+  Serial.println(10, BIN);
+  Serial.println(10, HEX);
+  Serial.println(10, OCT);
+  Serial.println(currentSettings[0]);
+  Serial.print(currentSettings[1]);
+  
+  pinMode(BUTTON1_PIN, INPUT);
+  pinMode(BUTTON2_PIN, INPUT);
+  menu_start();
+  running2(0,1);      //this makes it crash :^)
+  
+  //ticker.attach_ms(TIMERDELAYMS, timerHandler);
 
 }
 
-int lastButton=none;
+int lastButton=nobutton;
 
 void loop() {
+  // for(int i=0; i<30; i++){
+  //   running1();
+  //   delay(50);
+  // }
   
-  lastbutton=checkButton();
+  lastButton=checkButton();
 
   if(lastButton==button1){        
         //----------------------------- BUTTON OK BEHAVIOUR
@@ -89,7 +120,7 @@ void loop() {
           timer[1]=0;
           status=working;
           startTimer();
-          running1(timer[0], timer[1]);
+          running1();
           page=running1p;
           break;
 
@@ -109,7 +140,7 @@ void loop() {
           break;
 
         case menu_statsp:   //MAINMENU (STATS) -> OPEN STATS
-          stats_tot(getTotWorkTime);
+          stats_tot(getTotWorkTime());
           page=stats_totp;
           break;
         
@@ -126,8 +157,8 @@ void loop() {
         case stats_rstp:     //ASK IF SURE, RESTORE OR GO BACK
           sure();
           page=surep;
-          lastButton=none;        //is stuck till an answer is given
-          while(lastButton==none){
+          lastButton=nobutton;        //is stuck till an answer is given
+          while(lastButton==nobutton){
             lastButton=checkButton();
             if(lastButton==button1){   //confirm, restore
               setTotWorkSessions(0);
@@ -166,13 +197,13 @@ void loop() {
         case set_savep:       //SAVE SETTINGS -> MAINMENU(SET)
           setCurrentWorkMinutes(currentSettings[0]);
           setCurrentPauseMinutes(currentSettings[1]);
-          set();
+          menu_set();
           page=menu_setp;
           break;
 
         case set_backp:       //GO BACK WITHOUT SAVING -> MAINMENU(SET)
           currentSettingsGet();
-          set();
+          menu_set();
           page=menu_setp;
           break;
       }
@@ -208,7 +239,7 @@ void loop() {
           //LOOP PAUSE PAGES
           case pausep:
             extend();
-            page=extend();
+            page=extendp;
             break;
           
           case extendp:
@@ -224,7 +255,7 @@ void loop() {
 
           //LOOP THROUGH STATS MENU
           case stats_totp:
-            stats_sessions(getTotWorkSessions);
+            stats_sessions(getTotWorkSessions());
             page=stats_sessionsp;
             break;
 
@@ -234,7 +265,7 @@ void loop() {
             break;
 
           case stats_rstp:
-            stats_tot(getTotWorkTime);
+            stats_tot(getTotWorkTime());
             page=stats_totp;
             break;
 
@@ -257,29 +288,31 @@ void loop() {
         }
   }
 
-  if(page==pausep || page==pausep){
-    ticker.attach(TIMERDELAY, timerHandlerPause)
-  }
+  // if(page==pausep || page==pausep){
+  //   ticker.attach_ms(TIMERDELAYMS, timerHandler)
+  // }
 }
 
 
 int checkButton(){
-
+/*
   if(digitalRead(BUTTON1_PIN)==HIGH)
     return button1;
   else if (digitalRead(BUTTON2_PIN) ==HIGH)
     return button2;
   else
-    return none;
+    return nobutton;
+    */
+    return nobutton;
 
 }
 
 
 void startTimer(){
-  timer.attach_ms(TIMERDELAYMS, timerHandler);
+  ticker.attach_ms(TIMERDELAYMS, timerHandler);
 }
 void stopTimer(){
-  timer.detach();
+  ticker.detach();
 };
 
 void timerHandler(){
@@ -314,11 +347,11 @@ void timerHandler(){
 
     if(status==working){
       if(page==running2p)   //if WORKING with the clock, update it
-        running2(time[0], time[1]);
+        running2(timer[0], timer[1]);
       else
         running1();         //else update animation
     } else if(status==paused){    //if paused update the clock
-      pause(time[0], time[1]);  
+      pause(timer[0], timer[1]);  
     }
   }
 }
@@ -330,6 +363,6 @@ void currentSettingsGet(){
 
 
 void updateStats(){
-  setTotWorkSessions(getTotWorkSessions+1);
-  setTotWorkTime(getTotWorkTime+currentSettings[0]);
+  setTotWorkSessions(getTotWorkSessions()+1);
+  setTotWorkTime(getTotWorkTime()+currentSettings[0]);
 }

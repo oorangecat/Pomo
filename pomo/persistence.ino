@@ -16,6 +16,8 @@
 #define TOTWORKTIMEADDRESS 8
 #define TOTWORKSESSIONSADDRESS 12
 
+#define ADDRESS
+
 
 void persistenceInit(){
       EEPROM.begin(EEPROM_SIZE);
@@ -29,10 +31,12 @@ int getCurrentPauseMinutes(){
 }
 
 void setCurrentWorkMinutes(int time){
-    EEPROM.write(CURRENTWORKADDRESS, time);
+    EEPROM.put(CURRENTWORKADDRESS, time);
+    EEPROM.commit();
 }
 void setCurrentPauseMinutes(int time){
-    EEPROM.write(CURRENTPAUSEADDRESS, time);
+    EEPROM.put(CURRENTPAUSEADDRESS, time);
+    EEPROM.commit();
 }
 
 int getTotWorkTime(){
@@ -43,8 +47,10 @@ int getTotWorkSessions(){
 }
 
 void setTotWorkTime(int time){
-    EEPROM.write(TOTWORKTIMEADDRESS, time);
+    EEPROM.put(TOTWORKTIMEADDRESS, time);
+    EEPROM.commit();
 }
 void setTotWorkSessions(int sessions){
-    EEPROM.write(TOTWORKSESSIONSADDRESS, sessions);
+    EEPROM.put(TOTWORKSESSIONSADDRESS, sessions);
+    EEPROM.commit();
 }

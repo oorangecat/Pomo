@@ -1,4 +1,4 @@
-enum pages{
+typedef enum {
     menu_startp, //x >
     running1p, //x >
     running2p,//x >
@@ -17,5 +17,5 @@ enum pages{
     set_savep,//x >
     surep, //x >
     set_backp // x >
-}
+} pages_type;
 
