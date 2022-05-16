@@ -6,14 +6,9 @@
 #include "ESP8266WiFi.h"
 #include "WiFiClient.h"
 
-//for lightsleep
 
-// extern "C" {
-//    #include "gpio.h"
-//  }
-//  extern "C" {
-//    #include "user_interface.h"
-//  }
+#define PRODUCTION FALSE
+
 
 #define BUTTON1_PIN 12     //ok
 #define BUTTON1_GPIO 12
@@ -35,10 +30,6 @@
 
 typedef enum  { button1, button2, nobutton } buttons_type;
 typedef enum  { working, paused, none } states_type;
-
-//states_type states;
-//buttons_type buttons_type;
-//pages_type pages;
 
 
 Ticker ticker;
@@ -66,13 +57,14 @@ void setup() {
   persistenceInit();
   setupOled();
 
-  /*TO BE REMOVED - INIT EEPROM FIRST TIME
-  setCurrentWorkMinutes(1);
-  setCurrentPauseMinutes(1);
+  #if PRODUCTON == FALSE
+  setCurrentWorkMinutes(25);
+  setCurrentPauseMinutes(5);
 
   setTotWorkTime(0);
   setTotWorkSessions(0);
-  */
+  #endif
+
   currentSettingsGet();
 
   Serial.begin(115200);
