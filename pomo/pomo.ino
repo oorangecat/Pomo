@@ -327,6 +327,8 @@ void loop() {
       } else if(status==paused && page==pausep){    //if paused update the clock
         pause(timer[0], timer[1]);  
         page=pausep;
+      } else if (page==readyp){
+        ready();
       }
      toBeUpdated=false;
   }
@@ -386,8 +388,9 @@ void timerHandler(){
 
     } else if(status==paused){      //if pause, go to ready and wait
       stopTimer();
-      ready();
+      //ready();
       page=readyp;
+      toBeUpdated=true;
     }
     
   } else {              //if timer is running
@@ -409,8 +412,9 @@ void timerHandler(){
       page=pausep;
     }
     */
-    if(page==running2p) 
+    if(page==running2p || page==pausep) 
       toBeUpdated=true;
+    
   }
 }
 

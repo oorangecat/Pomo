@@ -5,6 +5,8 @@
 #include "animation.h"
 #include "oled.h"
 
+#include "font.h"
+
 
 static int lastFrame=0;
 
@@ -34,16 +36,17 @@ void setupOled(){
     delay(drawDelay);
     // Clear the buffer
     display.clearDisplay();
+    display.setFont(&NIAGSOL32pt7b);         //FONT
     
 
 }
 
 //Basic block for printing text 
-void printOled(char *str, int size){
+void printOled(char *str, int size){            //TODO: remove size reference after testing
     
     display.clearDisplay();
 
-    display.setTextSize(size);
+    //display.setTextSize(size);                
     display.setTextColor(WHITE);
     display.setCursor(0, 0);
     display.println(str);
