@@ -4,7 +4,7 @@
 #define OLED_ADDRESS 0x3C
 
 #define drawDelay 5
-#define standardSize 3
+#define standardSize 1
 #define frameNum 15
 
 

@@ -3,8 +3,20 @@
 #include "pages.h"  //contains enum pages
 #include <stdlib.h>
 #include <Ticker.h>
+#include "ESP8266WiFi.h"
+#include "WiFiClient.h"
+
+//for lightsleep
+
+// extern "C" {
+//    #include "gpio.h"
+//  }
+//  extern "C" {
+//    #include "user_interface.h"
+//  }
 
 #define BUTTON1_PIN 12     //ok
+#define BUTTON1_GPIO 12
 #define BUTTON2_PIN 13     //arrow
 #define TIMERDELAYMS 999
 #define DONEDELAY 5000
@@ -18,6 +30,8 @@
 #define MINPAUSE 1
 #define BUTTONDELAY 200
 #define SCREENDELAY 30
+
+#define LIGHTSLEEPDELAY 900
 
 typedef enum  { button1, button2, nobutton } buttons_type;
 typedef enum  { working, paused, none } states_type;
@@ -41,10 +55,13 @@ void timerHandler();
 void currentSettingsGet();
 void updateStats();   //add a session to stored stats
 
+void turnOffWifi();
 
 
 
 void setup() {
+
+  turnOffWifi();
 
   persistenceInit();
   setupOled();
@@ -159,6 +176,7 @@ void loop() {
         case stats_rstp:     //ASK IF SURE, RESTORE OR GO BACK
           sure();
           page=surep;
+          delay(BUTTONDELAY);
           lastButton=nobutton;        //is stuck till an answer is given
           while(lastButton==nobutton){
             lastButton=checkButton();
@@ -331,6 +349,7 @@ void loop() {
         ready();
       }
      toBeUpdated=false;
+     //lightSleepMode(LIGHTSLEEPDELAY);
   }
   
   if(status==working && page==running1p && updateRunning>=SCREENDELAY){
@@ -428,3 +447,18 @@ void updateStats(){
   setTotWorkSessions(getTotWorkSessions()+1);
   setTotWorkTime(getTotWorkTime()+currentSettings[0]);
 }
+
+void turnOffWifi(){
+  Serial.println("Sleep begin");
+  WiFi.mode(WIFI_OFF);
+  //WiFi.forceSleepBegin();
+}
+
+// void lightSleepMode(uint32_t time_ms){
+//   Serial.println("light sleep...");
+//   wifi_fpm_set_sleep_type(LIGHT_SLEEP_T); // set sleep type, the above    posters wifi_set_sleep_type() didnt seem to work for me although it did let me compile and upload with no errors 
+//    wifi_fpm_open(); // Enables force sleep
+//    gpio_pin_wakeup_enable(GPIO_ID_PIN(BUTTON1_GPIO), GPIO_PIN_INTR_LOLEVEL); // GPIO_ID_PIN(2) corresponds to GPIO2 on ESP8266-01 , GPIO_PIN_INTR_LOLEVEL for a logic low, can also do other interrupts, see gpio.h above
+//    wifi_fpm_do_sleep(1000*time_ms); // Sleep for longest possible time
+//  }
+

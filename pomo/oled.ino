@@ -36,7 +36,7 @@ void setupOled(){
     delay(drawDelay);
     // Clear the buffer
     display.clearDisplay();
-    display.setFont(&NIAGSOL32pt7b);         //FONT
+    display.setFont(&bluesquarebold32pt7b);         //FONT
     
 
 }
@@ -46,9 +46,9 @@ void printOled(char *str, int size){            //TODO: remove size reference af
     
     display.clearDisplay();
 
-    //display.setTextSize(size);                
+    display.setTextSize(size);                
     display.setTextColor(WHITE);
-    display.setCursor(0, 0);
+    display.setCursor(0 , 50);
     display.println(str);
     display.display(); 
     delay(drawDelay);
@@ -61,7 +61,7 @@ char *intToChar(int num){
 
 
 void menu_start(){
-    printOled("START >", standardSize);
+    printOled(" START", standardSize);
 }
 
 void running1(){
@@ -83,9 +83,8 @@ void running2(int m, int s){
     //strcat(buf, intToChar(m));    //this makes it crash
     //strcat(buf, ":");
     //strcat(buf, intToChar(s));
-     Serial.println("Pause:");
 
-    sprintf(buf,"%02d:%02d",m,s);
+    sprintf(buf," %02d:%02d",m,s);
     Serial.print(buf);
     printOled(buf, standardSize);
 }
@@ -95,7 +94,7 @@ void done(){
 }
 
 void fail(){
-    printOled("FAIL! :(", standardSize);
+    printOled(" FAIL :(", standardSize);
 }
 
 void pause(int m, int s){           //same as running2, showing clock
@@ -117,7 +116,7 @@ void sure(){
 }
 
 void menu_stats(){
-    printOled("< STATS >", standardSize);
+    printOled(" STATS", standardSize);
 }
 
 void stats_tot(int totMin){
@@ -135,11 +134,11 @@ void stats_sessions(int totSessions){
 }
 
 void stats_rst(){
-    printOled("< RST", standardSize);
+    printOled("  RST", standardSize);
 }
 
 void menu_set(){
-    printOled("< SET >", standardSize);
+    printOled("  SET", standardSize);
 }
 
 void set_work(int minShown){
@@ -157,9 +156,9 @@ void set_pause(int minShown){
 }
 
 void set_save(){
-    printOled("< SAVE",standardSize);
+    printOled("  SAVE",standardSize);
 }
 
 void set_back(){
-    printOled("BACK", standardSize);
+    printOled("  BACK", standardSize);
 }
