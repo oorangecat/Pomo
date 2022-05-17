@@ -90,7 +90,7 @@ void running2(int m, int s){
 }
 
 void done(){
-    printOled("DONE! <3", standardSize);
+    printOled("DONE<3", standardSize);
 }
 
 void fail(){

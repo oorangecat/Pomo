@@ -7,7 +7,7 @@
 #include "WiFiClient.h"
 
 
-#define PRODUCTION FALSE
+#define PRODUCTION true
 
 
 #define BUTTON1_PIN 12     //ok
@@ -23,8 +23,9 @@
 #define MAXPAUSE 20
 #define MINWORK 5
 #define MINPAUSE 1
+
 #define BUTTONDELAY 200
-#define SCREENDELAY 30
+#define SCREENDELAY 50    //50ms=20fps
 
 #define LIGHTSLEEPDELAY 900
 
