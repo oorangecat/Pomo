@@ -121,14 +121,14 @@ void menu_stats(){
 
 void stats_tot(int totMin){
     char buf[15];
-    sprintf(buf,"T:%05d",totMin);
+    sprintf(buf,"T:%04d",totMin);
 
     printOled(buf, standardSize);
 }
 
 void stats_sessions(int totSessions){
     char buf[15];
-    sprintf(buf,"S:%05d",totSessions);
+    sprintf(buf,"S:%04d",totSessions);
 
     printOled(buf, standardSize);
 }

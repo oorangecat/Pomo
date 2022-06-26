@@ -58,13 +58,13 @@ void setup() {
   persistenceInit();
   setupOled();
 
-  #if PRODUCTON == FALSE
-  setCurrentWorkMinutes(25);
-  setCurrentPauseMinutes(5);
+  //#if PRODUCTON == FALSE
+  //setCurrentWorkMinutes(25);
+  //setCurrentPauseMinutes(5);
 
-  setTotWorkTime(0);
-  setTotWorkSessions(0);
-  #endif
+  //setTotWorkTime(0);
+  //setTotWorkSessions(0);
+  //#endif
 
   currentSettingsGet();
 
