@@ -6,5 +6,5 @@
 - 2x Buttons + related resistor
 - Some way to handle power. I used a 500mah battery with a charging+step up circuit. 
 
-### Power Management
-#TODO
+The idea is creating a long lasting, simple to use, pomodoro timer that can be reliably used during long study/work sessions. 
+A real prototype was 3d printed and assembled.
